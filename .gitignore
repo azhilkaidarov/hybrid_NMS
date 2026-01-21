@@ -1,0 +1,16 @@
+# Cursor local project rules (not for repo)
+/.cursorrules
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+.env
+
+# OS / IDE
+.DS_Store
+
+# Generated artifacts
+/outputs/*
+!/outputs/.gitkeep
