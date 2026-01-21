@@ -45,9 +45,9 @@ def draw_bbox(image: np.ndarray, bbox: Bbox, thickness: int = 3) -> np.ndarray:
     )
 
     # ДОБАВЛЯЕМ ПОДПИСЬ
-    text = bbox.label
+    text = f"{bbox.label} conf - ({str(round(bbox.confidence, 2))}) "
     font = cv2.FONT_ITALIC
-    font_scale = 1
+    font_scale = 0.6
 
     # КООРДИНАТЫ ТЕКСТА ЧУТЬ ВЫШЕ ВЕРХНЕГО ЛЕВОГО УГЛА
     text_org = (bbox.x_min, max(0, bbox.y_min - 8))
@@ -147,17 +147,26 @@ def merge(bboxes: list[Bbox]) -> Bbox:
 
 # РУЧНОЙ NMS
 def hybrid_nms(bboxes: list[Bbox], treshold: float) -> list[Bbox]:
+    print("\n-----START NMS-----\n")
     length = len(bboxes)
+    print(f"--We got {length} bboxes.\n")  
     # INDEX - ИНДЕКС ОПРЕДЕЛЕННОГО BBOX в BBOXES, VALUE - КОРЕНЬ, КУДА ОН БУДЕТ СЛИВАТЬСЯ ПОЗЖЕ
     parents = list(range(length))
 
+    print("--Start STEP №1") 
     # ЭТАП №1 - MERGE BBOXES WITH IoU > 0.75 ----------------------------------
     # ШАГ 1. ПОПАРНО ВСЕ ПРОВЕРИМ. У СЛИВАЮЩИХСЯ BOX'ов в PARENTS ДОЛЖЕН БЫТЬ УКАЗАН КОРЕНЬ СЛИЯНИЯ
     for i in range(length-1):
         for j in range(i+1, length):
-            if iou(bboxes[i], bboxes[j]) >= 0.75:
+            # print(f"{bboxes[i].label} and {bboxes[j].label} have IoU value = {round(iou(bboxes[i], bboxes[j]), 2)}")
+            if iou(bboxes[i], bboxes[j]) >= 0.60:
                 union(parents, i, j)
-    # parents = [0,0,0,0,0,0,6] ПОЛУЧИЛИ ВСЕ КОРНИ СЛИЯНИЯ
+
+    print(f"-parents: list[int] = {parents}") 
+    if len(set(parents)) == len(parents):
+        print("-No bboxes to merge!")
+    else:
+        print("-There's some bboxes to merge!")
 
     # ШАГ 2. РАЗДЕЛИМ ВСЕ СЛИЯНИЯ НА ОТДЕЛЬНЫЕ ГРУППЫ
     group_bboxes = defaultdict(list)
@@ -170,24 +179,28 @@ def hybrid_nms(bboxes: list[Bbox], treshold: float) -> list[Bbox]:
     # ШАГ 3. ПЕРЕДАЕМ MERGE() КАЖДУЮ ГРУППУ. СТАРЫЕ ББОКСЫ УДАЛЯЕМ И ДОБАВЛЯЕМ НОВЫЙ
     for group in group_bboxes.values():
         if len(group) > 1:
-            new_box = merge(group)
+            merge_bboxes = [bboxes[i] for i in group]
+            new_box = merge(merge_bboxes)
             bboxes = delete_bboxes(bboxes, set(group))
             bboxes.append(new_box)
 
     length = len(bboxes)
-
+    
+    print("\n--Start STEP №2") 
     # ЭТАП №2 - DELETE BBOX WITH LESS CONFIDENCE VALUE ------------------------
     to_die = []
     for i in range(length-1):
         for j in range(i + 1, length):
             if iou(bboxes[i], bboxes[j]) > treshold:
-                print("SOMETHING IS HERE")
                 if bboxes[i].confidence >= bboxes[j].confidence:
                     l_c_bbox = j
                 else:
                     l_c_bbox = i
                 to_die.append(l_c_bbox)
-    bboxes = delete_bboxes(bboxes, set(to_die))
+    
+    to_die_set = sorted(set(to_die))
+    print(f"These bboxes {[bboxes[idx].label for idx in to_die_set]} will be deleted!\n")
+    bboxes = delete_bboxes(bboxes, set(to_die_set))
 
     return bboxes
     # ЭТАП №3 - РАДОВАТЬСЯ! ---------------------------------------------------
@@ -240,7 +253,8 @@ def main():
     image_path = "sample_image.png"
     image = load_image(image_path)
     # ВЫБЕРИ РАЗМЕР И СИД <----------------------------------------
-    bboxes = random_bboxes(image, n=10, seed=42)
+    # Откоментируй строку 161, чтобы увидеть все IoU
+    bboxes = random_bboxes(image, n=10, seed=4)
 
     draw_bboxes(image, bboxes)
 
@@ -251,7 +265,7 @@ def main():
 
     image_path = "sample_image.png"
     image = load_image(image_path)
-    new_bboxes = hybrid_nms(bboxes, 0.4)
+    new_bboxes = hybrid_nms(bboxes, 0.2)
     draw_bboxes(image, new_bboxes)
     cv2.imshow("Bounding Boxes after NMS", image)
     cv2.waitKey(0)
