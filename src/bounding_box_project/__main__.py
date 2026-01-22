@@ -20,7 +20,10 @@ def main(argv: list[str] | None = None) -> int:
         help="Path to input image",
     )
     parser.add_argument("--seed", type=int, default=4, help="RNG seed")
-    parser.add_argument("--n", type=int, default=10, help="Number of random boxes")
+    parser.add_argument(
+        "--n", type=int,
+        default=10,
+        help="Number of random boxes")
     parser.add_argument(
         "--threshold",
         type=float,
@@ -44,11 +47,15 @@ def main(argv: list[str] | None = None) -> int:
         action="store_true",
         help="Show OpenCV windows (requires GUI)",
     )
-    parser.add_argument("--verbose", action="store_true", help="Print NMS debug output")
+    parser.add_argument(
+        "--verbose",
+        action="store_true",
+        help="Print NMS debug output")
 
     args = parser.parse_args(argv)
 
-    # Delay imports so `--help` works even if optional deps (opencv) aren't installed yet.
+    # Delay imports so `--help` works even
+    # if optional deps (opencv) aren't installed yet.
     from .image_io import load_image, save_image
     from .nms import hybrid_nms
     from .synthetic import random_bboxes
@@ -92,4 +99,3 @@ def main(argv: list[str] | None = None) -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
-

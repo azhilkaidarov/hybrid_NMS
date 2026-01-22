@@ -1,6 +1,11 @@
 # Cursor local project rules (not for repo)
 /.cursorrules
 
+# Cursor (track rules, ignore everything else)
+.cursor/*
+!.cursor/rules/
+!.cursor/rules/**
+
 # Python
 __pycache__/
 *.py[cod]
