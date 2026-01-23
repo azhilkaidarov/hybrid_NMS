@@ -15,6 +15,12 @@ dependencies = [
 
 [tool.setuptools]
 package-dir = {"" = "src"}
-
-[tool.setuptools.packages.find]
-where = ["src"]
+py-modules = [
+    "bounding_box_project",
+    "boxes",
+    "image_io",
+    "iou",
+    "nms",
+    "synthetic",
+    "viz",
+]

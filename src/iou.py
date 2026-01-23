@@ -1,6 +1,4 @@
-from __future__ import annotations
-
-from .boxes import Bbox
+from boxes import Bbox
 
 
 def iou(bbox_1: Bbox, bbox_2: Bbox) -> float:

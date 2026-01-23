@@ -1,8 +1,6 @@
-from __future__ import annotations
-
 import numpy as np
 
-from .boxes import Bbox
+from boxes import Bbox
 
 
 def _require_cv2():
@@ -51,4 +49,3 @@ def draw_bboxes(image: np.ndarray, bboxes: list[Bbox], thickness: int = 3) -> np
     for bbox in bboxes:
         draw_bbox(image, bbox, thickness=thickness)
     return image
-

@@ -1,9 +1,7 @@
-from __future__ import annotations
-
 from collections import defaultdict
 
-from .boxes import Bbox
-from .iou import iou
+from boxes import Bbox
+from iou import iou
 
 
 def union(parents: list[int], a: int, b: int) -> None:
@@ -24,7 +22,7 @@ def delete_bboxes(bboxes: list[Bbox], to_del: set[int]) -> list[Bbox]:
     return [bboxes[i] for i in range(len(bboxes)) if i not in to_del]
 
 
-def merge(bboxes: list[Bbox]) -> Bbox:
+def merge(bboxes: list[Bbox], color=(180, 105, 255)) -> Bbox:
     x_min = min(box.x_min for box in bboxes)
     y_min = min(box.y_min for box in bboxes)
     x_max = max(box.x_max for box in bboxes)
@@ -32,7 +30,6 @@ def merge(bboxes: list[Bbox]) -> Bbox:
     confidence = max(box.confidence for box in bboxes)
 
     # BGR for OpenCV
-    color = (180, 105, 255)
     return Bbox(x_min, y_min, x_max, y_max, confidence, "MERGED OBJ", color)
 
 
@@ -79,7 +76,7 @@ def hybrid_nms(
     # Merge each group into one bbox (if group size > 1)
     for group in group_bboxes.values():
         if len(group) > 1:
-            merged = merge([bboxes[i] for i in group])
+            merged = merge([bboxes[i] for i in group], )
             bboxes = delete_bboxes(bboxes, set(group))
             bboxes.append(merged)
 

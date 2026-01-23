@@ -8,8 +8,8 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 
-from bounding_box_project.boxes import Bbox  # noqa: E402
-from bounding_box_project.iou import iou  # noqa: E402
+from bounding_box_project import Bbox  # noqa: E402
+from bounding_box_project import iou  # noqa: E402
 
 
 class TestIoU(unittest.TestCase):

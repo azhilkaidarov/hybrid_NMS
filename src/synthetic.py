@@ -1,8 +1,6 @@
-from __future__ import annotations
-
 import numpy as np
 
-from .boxes import Bbox
+from boxes import Bbox
 
 
 def random_bboxes(

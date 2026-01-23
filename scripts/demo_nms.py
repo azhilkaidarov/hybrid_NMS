@@ -14,7 +14,7 @@ def _add_src_to_path() -> None:
 
 def main() -> int:
     _add_src_to_path()
-    from bounding_box_project.__main__ import main as pkg_main
+    from bounding_box_project import main as pkg_main
 
     return pkg_main()
 

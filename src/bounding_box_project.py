@@ -1,12 +1,27 @@
-from __future__ import annotations
+"""Bounding box study project: IoU + NMS + visualization utilities.
+
+This module is also executable:
+    uv run python -m bounding_box_project --show
+"""
 
 import argparse
 from pathlib import Path
 
+from boxes import Bbox
+from iou import iou
+from nms import hybrid_nms
+
+__all__ = [
+    "Bbox",
+    "hybrid_nms",
+    "iou",
+    "main",
+]
+
 
 def _repo_root() -> Path:
-    # <repo>/src/bounding_box_project/__main__.py  -> parents[2] == <repo>
-    return Path(__file__).resolve().parents[2]
+    # <repo>/src/bounding_box_project.py  -> parents[1] == <repo>
+    return Path(__file__).resolve().parents[1]
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -16,13 +31,12 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument(
         "--image",
         type=Path,
-        default=repo_root / "data" / "sample" / "sample_image.png",
+        default=repo_root / "data" / "input" / "sample_image.png",
         help="Path to input image",
     )
     parser.add_argument("--seed", type=int, default=4, help="RNG seed")
     parser.add_argument(
-        "--n", type=int,
-        default=10,
+        "--n", type=int, default=10,
         help="Number of random boxes")
     parser.add_argument(
         "--threshold",
@@ -39,7 +53,7 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument(
         "--out-dir",
         type=Path,
-        default=repo_root / "outputs",
+        default=repo_root / "data" / "outputs",
         help="Directory to save output images",
     )
     parser.add_argument(
@@ -50,16 +64,16 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument(
         "--verbose",
         action="store_true",
-        help="Print NMS debug output")
+        help="Print NMS debug output",
+    )
 
     args = parser.parse_args(argv)
 
-    # Delay imports so `--help` works even
-    # if optional deps (opencv) aren't installed yet.
-    from .image_io import load_image, save_image
-    from .nms import hybrid_nms
-    from .synthetic import random_bboxes
-    from .viz import draw_bboxes
+    # Delay imports so `--help` works even if optional deps (opencv) aren't
+    # installed yet.
+    from image_io import load_image, save_image
+    from synthetic import random_bboxes
+    from viz import draw_bboxes
 
     # Load once to generate boxes (we'll reload for the second visualization)
     image = load_image(args.image)
@@ -80,17 +94,6 @@ def main(argv: list[str] | None = None) -> int:
     after = draw_bboxes(image2, bboxes_after)
     after_path = args.out_dir / "after_nms_output.jpg"
     save_image(after_path, after)
-
-    if args.show:
-        import cv2  # type: ignore
-
-        cv2.imshow("Bounding Boxes before NMS", before)
-        cv2.waitKey(0)
-        cv2.destroyAllWindows()
-
-        cv2.imshow("Bounding Boxes after NMS", after)
-        cv2.waitKey(0)
-        cv2.destroyAllWindows()
 
     print(f"Saved: {before_path}")
     print(f"Saved: {after_path}")
