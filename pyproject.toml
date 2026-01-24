@@ -1,10 +1,26 @@
+[build-system]
+requires = ["setuptools>=69", "wheel"]
+build-backend = "setuptools.build_meta"
+
 [project]
 name = "bounding-box-project"
 version = "0.1.0"
-description = "Add your description here"
+description = "Study project: IoU + NMS + bbox visualization"
 readme = "README.md"
 requires-python = ">=3.10"
 dependencies = [
     "numpy>=2.2.6",
     "opencv-python>=4.13.0.90",
+]
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+py-modules = [
+    "bounding_box_project",
+    "boxes",
+    "image_io",
+    "iou",
+    "nms",
+    "synthetic",
+    "viz",
 ]
